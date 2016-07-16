@@ -1,2 +1,2 @@
-# PokerGF1
+# Texas Hold'em
 Console User vs Bot poker game
