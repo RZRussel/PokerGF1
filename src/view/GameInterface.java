@@ -5,7 +5,7 @@ import logic.Card;
 import logic.Player;
 
 public class GameInterface {
-	public void redraw(Player[] players, Card[] openedCards, Action[] madeActions, int bank){
+	public void redraw(Player[] players, Card[] openedCards, Action lastAction, int bank){
 		
 	}
 	
