@@ -1,3 +1,8 @@
+package controller;
+
+import logic.*;
+import view.GameInterface;
+
 import java.util.ArrayList;
 import java.util.Stack;
 
@@ -16,7 +21,7 @@ import java.util.Stack;
  * 
  * 2. Big blind(leftmost from the big blind) adds minimum bet value to stack.
  * 
- * 3. Card stack mixes and each player receives 2 closed cards.
+ * 3. logic.Card stack mixes and each player receives 2 closed cards.
  * 
  * 5. Each player starting from leftmost to big blind make action:
  * Call - add to bank the same value last player bet.
@@ -71,7 +76,7 @@ public class GameEngine {
 	int bankValue;
 	
 	/**
-	 * Player's index in players list described above to make action now.
+	 * logic.Player's index in players list described above to make action now.
 	 */
 	int actionPlayerIndex;
 	

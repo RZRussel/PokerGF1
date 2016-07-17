@@ -1,3 +1,8 @@
+package view;
+
+import logic.Action;
+import logic.Card;
+import logic.Player;
 
 public class GameInterface {
 	public void redraw(Player[] players, Card[] openedCards, Action[] madeActions, int bank){

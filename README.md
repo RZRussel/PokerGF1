@@ -1,2 +1,2 @@
 # Texas Hold'em
-Console User vs Bot poker game
+Console logic.User vs logic.Bot poker game

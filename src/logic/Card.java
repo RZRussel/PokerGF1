@@ -1,3 +1,4 @@
+package logic;
 
 public class Card {
 	public static enum Suite { HEART, DIAMOND, CLUBS, SPADE }
