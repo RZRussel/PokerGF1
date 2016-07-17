@@ -1,5 +1,7 @@
 
 public class Action {
-	public short type;
+	public static enum Type { BET, RAISE, CALL, CHECK, FAULT }
+	
+	public Type type;
 	public int value;
 }
