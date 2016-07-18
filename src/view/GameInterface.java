@@ -67,7 +67,7 @@ public class GameInterface {
                 }
                 else if(tok[0].equals("f")) {
                     ac.value = 0;
-                    ac.type = Action.Type.FAULT;
+                    ac.type = Action.Type.FOLD;
                     return ac;
                 }
                 else if(tok[0].equals("=")) {
