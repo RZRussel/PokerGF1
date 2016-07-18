@@ -37,10 +37,10 @@ public class GameInterface {
 		pl[0].stack, pl[1].stack);
 	}
     // refresh information about state of players
-	public void redraw(Player[] players, Card[] openedCards, Action[] madeActions, int bank){
+	public void redraw(Player[] players, Card[] openedCards, Action lastAction, int bank, boolean showsBotCards){
 		System.out.println(ShowTable(openedCards));
         System.out.println(ShowBank(bank));
-        System.out.println(ShowPlayerState(players, false));
+        System.out.println(ShowPlayerState(players, showsBotCards));
 
 	}
 	// ask user action
@@ -55,7 +55,7 @@ public class GameInterface {
             System.out.println(".");
 
         while(true) {
-            System.out.print("You turn: ");
+            System.out.print("You turn('c' - check, 'f' - fold, '=' - call, '+<value>' - bet/raise): ");
             String ans = sn.nextLine().trim().toLowerCase();
             String tok[] = ans.split(" ");
 
@@ -67,7 +67,7 @@ public class GameInterface {
                 }
                 else if(tok[0].equals("f")) {
                     ac.value = 0;
-                    ac.type = Action.Type.FAULT;
+                    ac.type = Action.Type.FOLD;
                     return ac;
                 }
                 else if(tok[0].equals("=")) {
@@ -124,7 +124,7 @@ public class GameInterface {
         opened[1].suite = Card.Suite.DIAMOND;
         opened[1].value = Card.Value.C7;
 
-        redraw(players, opened, null, 400);
+        redraw(players, opened, null, 400, false);
 
         // requestAction
 
