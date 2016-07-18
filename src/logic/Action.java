@@ -1,7 +1,7 @@
 package logic;
 
 public class Action {
-	public static enum Type { BET, RAISE, CALL, CHECK, FAULT }
+	public enum Type { BET, RAISE, ALL_IN, CALL, CHECK, FOLD }
 	
 	public Type type;
 	public int value;
