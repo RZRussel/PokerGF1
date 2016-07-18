@@ -1,7 +1,7 @@
 # Texas Hold'em
 Console User vs Bot poker game
 
-#What new?
+#Whats new?
 
 -	Full Texas Hold'em game flow implementation added except some winner decision edge cases
 -   Console game interface implementation added
