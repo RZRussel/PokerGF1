@@ -37,7 +37,7 @@ public class GameInterface {
 		pl[0].stack, pl[1].stack);
 	}
     // refresh information about state of players
-	public void redraw(Player[] players, Card[] openedCards, Action[] madeActions, int bank){
+	public void redraw(Player[] players, Card[] openedCards, Action lastAction, int bank){
 		System.out.println(ShowTable(openedCards));
         System.out.println(ShowBank(bank));
         System.out.println(ShowPlayerState(players, false));
