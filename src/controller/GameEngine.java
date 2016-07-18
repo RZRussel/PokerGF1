@@ -109,6 +109,8 @@ public class GameEngine {
      */
     private int betValue;
 
+    private int roundResult;
+
 	public void startGame(int aInitStackValue, int aMinBetValue){
 	    // initialize default values
 		minBetValue = aMinBetValue;
@@ -234,6 +236,7 @@ public class GameEngine {
                 return true;
             }else{
                 // make decision about who won the round
+                calculateRoundResult();
                 return false;
             }
         }
@@ -260,7 +263,7 @@ public class GameEngine {
             }else {
                 // mark bot fault for not valid action
                 lastPlayerAction = new Action();
-                lastPlayerAction.type = Action.Type.FAULT;
+                lastPlayerAction.type = Action.Type.FOLD;
                 lastPlayerAction.value = 0;
             }
         }
@@ -280,6 +283,7 @@ public class GameEngine {
                 return true;
             }else{
                 // make decision about who won the round
+                calculateRoundResult();
                 return false;
             }
         }
@@ -321,8 +325,9 @@ public class GameEngine {
 
             // update player's stack
             players[actionPlayerIndex].stack -= callValue;
-        }else if(lastPlayerAction.type == Action.Type.FAULT){
+        }else if(lastPlayerAction.type == Action.Type.FOLD){
             // player fault so no futher actions required
+            calculateRoundResult();
             return false;
         }
 
@@ -398,6 +403,28 @@ public class GameEngine {
 
         return true;
 	}
+
+	private  void calculateRoundResult(){
+	    if(lastPlayerAction.type == Action.Type.FOLD){
+            Player player = players[actionPlayerIndex];
+            roundResult = player.getClass() == Bot.class ? 1 : -1;
+        }else{
+            // make decision about who won the round
+            ArrayList<Card> userHand = (ArrayList<Card>) opennedCards.clone();
+            for (int i = 0; i < 2; i++){
+                userHand.add(players[0].cards[i]);
+            }
+
+            ArrayList<Card> botHand = (ArrayList<Card>) opennedCards.clone();
+            for (int i = 0; i < 2; i++){
+                botHand.add(players[1].cards[i]);
+            }
+
+            Combination userCombination = CombinatorsPredictor.chooseBestCombination(userHand);
+            Combination botCombination = CombinatorsPredictor.chooseBestCombination(botHand);
+            roundResult = CombinatorsPredictor.compareTwoCombinations(userCombination, botCombination);
+        }
+    }
 
 	private void completeBet(){
         playersBetValues[0] = 0;
