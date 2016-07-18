@@ -168,7 +168,7 @@ public class GameEngine {
 
         do{
             Card[] aOpenedCards = opennedCards.size() > 0 ? opennedCards.toArray(new Card[opennedCards.size()]) : new Card[0];
-            gameInterface.redraw(players, aOpenedCards, lastPlayerAction, bankValue);
+            gameInterface.redraw(players, aOpenedCards, lastPlayerAction, bankValue, false);
         }while(nextAction());
 
         // complete current round

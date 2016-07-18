@@ -37,10 +37,10 @@ public class GameInterface {
 		pl[0].stack, pl[1].stack);
 	}
     // refresh information about state of players
-	public void redraw(Player[] players, Card[] openedCards, Action lastAction, int bank){
+	public void redraw(Player[] players, Card[] openedCards, Action lastAction, int bank, boolean showsBotCards){
 		System.out.println(ShowTable(openedCards));
         System.out.println(ShowBank(bank));
-        System.out.println(ShowPlayerState(players, false));
+        System.out.println(ShowPlayerState(players, showsBotCards));
 
 	}
 	// ask user action
@@ -119,7 +119,7 @@ public class GameInterface {
         opened[1].suite = Card.Suite.DIAMOND;
         opened[1].value = Card.Value.C7;
 
-        redraw(players, opened, null, 400);
+        redraw(players, opened, null, 400, false);
 
         // requestAction
 
