@@ -70,16 +70,31 @@ public class GameInterface {
                     ac.type = Action.Type.FOLD;
                     return ac;
                 }
+                else if(tok[0].equals("a")) {
+                    ac.value = 0;
+                    ac.type = Action.Type.ALL_IN;
+                    return ac;
+                }
                 else if(tok[0].equals("=")) {
                     ac.value = botAction.value;
                     ac.type = Action.Type.CALL;
+                    return ac;
+                }
+                else if(Character.isDigit(tok[0].charAt(0))) {
+                    int getBet = Integer.valueOf(tok[0]).intValue();
+                    if(getBet < 100 || getBet % 100 > 0) {
+                        System.out.println("Must be divisible by 100");
+                        continue;
+                    }
+                    ac.value = getBet;
+                    ac.type = Action.Type.BET;
                     return ac;
                 }
                 else if(tok[0].charAt(0) == '+') {
                     String firstTok = (tok.length > 1) ? tok[0] + tok[1] : tok[0];
                     int getVal = Integer.valueOf(firstTok.substring(1,firstTok.length())).intValue() + botAction.value;
                     if(getVal < 100 || getVal % 100 > 0) {
-                        System.out.println("Must be equal to 100"); // another message
+                        System.out.println("Must be divisible by 100");
                         continue;
                     }
                     ac.value = getVal;
