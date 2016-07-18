@@ -24,6 +24,11 @@ public class CombinatorsPredictor {
                 bestCombination = findBestCombination(bestCombination, comb);
                 continue;
             }
+            comb = checkFourOfAKind(cardsComb);
+            if (comb != null) {
+                bestCombination = findBestCombination(bestCombination, comb);
+                continue;
+            }
             comb = checkTwoPair(cardsComb);
             if (comb != null) {
                 bestCombination = findBestCombination(bestCombination, comb);
@@ -43,7 +48,8 @@ public class CombinatorsPredictor {
     }
 
     public static Combination predictBestCombination(final Card card1, final Card card2) {
-        return null;
+        Combination comb = new Combination();
+        return comb;
     }
 
     public static int compareTwoCombinations(final Combination combination1, final Combination combination2) {
@@ -129,6 +135,28 @@ public class CombinatorsPredictor {
                 comb.priority = cardsComb.get(cardsComb.size() - 2).value.ordinal();
             }
             return comb;
+        }
+        return null;
+    }
+
+    private static Combination checkFourOfAKind(final List<Card> cardComb) {
+        int startIdx = cardComb.size() - 1;
+        if (cardComb.get(cardComb.size() - 1).value.ordinal() !=
+                cardComb.get(cardComb.size() - 2).value.ordinal()) {
+            startIdx--;
+        }
+        int priority = cardComb.get(startIdx).value.ordinal();
+        boolean isHand = true;
+        for (int i = startIdx; i >= 1; i--) {
+            if (cardComb.get(i).value.ordinal() != cardComb.get(i - 1).value.ordinal()) {
+                isHand = false;
+                break;
+            }
+        }
+        if (isHand) {
+            Combination comb = new Combination();
+            comb.type = Combination.Type.FOUR_OF_A_KIND;
+            comb.priority = priority;
         }
         return null;
     }
