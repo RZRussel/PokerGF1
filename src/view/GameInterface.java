@@ -6,7 +6,7 @@ import logic.Player;
 import java.util.Scanner;
 
 public class GameInterface {
-	private static final String[] strSuit = {"H", "D", "C", "S"};
+	private static final String[] strSuit = {"\u2665", "\u2666", "\u2663", "\u2660"};
 	private static final String[] strName = {"2 ", "3 ", "4 ", "5 ", 
 	       "6 ", "7 ", "8 ", "9 ", "10", "J ", "Q ", "K ", "A "};
 	// represent card as string       
@@ -77,7 +77,12 @@ public class GameInterface {
                 }
                 else if(tok[0].charAt(0) == '+') {
                     String firstTok = (tok.length > 1) ? tok[0] + tok[1] : tok[0];
-                    ac.value = Integer.valueOf(firstTok.substring(1,firstTok.length())).intValue() + botAction.value;
+                    int getVal = Integer.valueOf(firstTok.substring(1,firstTok.length())).intValue() + botAction.value;
+                    if(getVal < 100 || getVal % 100 > 0) {
+                        System.out.println("Must be equal to 100"); // another message
+                        continue;
+                    }
+                    ac.value = getVal;
                     ac.type = Action.Type.RAISE;
                     return ac;
                 }
