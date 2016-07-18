@@ -420,9 +420,19 @@ public class GameEngine {
                 botHand.add(players[1].cards[i]);
             }
 
+            // calculate best cards combination for user
             Combination userCombination = CombinatorsPredictor.chooseBestCombination(userHand);
+
+            // calculate best cards combination for bot
             Combination botCombination = CombinatorsPredictor.chooseBestCombination(botHand);
-            roundResult = CombinatorsPredictor.compareTwoCombinations(userCombination, botCombination);
+
+            if(userCombination != null && botCombination != null){
+                // find out who has better combination
+                roundResult = CombinatorsPredictor.compareTwoCombinations(userCombination, botCombination);
+            }else{
+                // something went wrong, so force draw
+                roundResult = 0;
+            }
         }
     }
 
@@ -434,16 +444,21 @@ public class GameEngine {
     }
 	
 	private void completeRound(){
-	    // add bank value to won user's stack
-        Player wonPlayer = players[(actionPlayerIndex + 1)%2];
-        wonPlayer.stack += bankValue;
-        bankValue = 0;
-
-        if(wonPlayer.getClass() == User.class){
+	    // add bank value to won user's stack or equal portion to each of the users in tie case
+        if(roundResult == 1){
+            players[0].stack += bankValue;
             gameInterface.notifyUserWithMessage("You won in the game round!");
-        }else{
+        }else if(roundResult == -1){
+            players[1].stack += bankValue;
             gameInterface.notifyUserWithMessage("You lost in the game round!");
+        }else{
+            players[0].stack += bankValue/2;
+            players[1].stack += bankValue/2;
+            gameInterface.notifyUserWithMessage("Draw!");
         }
+
+        // reset bank value
+        bankValue = 0;
 
         // clear players' cards
         for (int i = 0; i < 2; i++){
