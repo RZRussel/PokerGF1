@@ -55,7 +55,7 @@ public class GameInterface {
             System.out.println(".");
 
         while(true) {
-            System.out.print("You turn: ");
+            System.out.print("You turn('c' - check, 'f' - fold, '=' - call, '+<value>' - bet/raise): ");
             String ans = sn.nextLine().trim().toLowerCase();
             String tok[] = ans.split(" ");
 
