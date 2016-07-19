@@ -135,7 +135,7 @@ public class GameEngine {
 
         while(startNewRound()){}
 
-        gameInterface.notifyUserWithMessage("Game completed");
+        gameInterface.notifyUserWithMessage("Game completed!");
 	}
 	
 	private boolean startNewRound(){
@@ -241,6 +241,11 @@ public class GameEngine {
             }
         }
 
+        // complete previous bet on big blind during preflop but allow him to start new one
+        if(opennedCards.size() == 0 && lastBetPlayerIndex == -1 && actionPlayerIndex == (smallBlindPlayerIndex + 1)%2){
+            completeBet();
+        }
+
         if(actionPlayer.getClass() == User.class){
             // request action from user until valid one not be detected
             Action userAction = null;
@@ -268,6 +273,10 @@ public class GameEngine {
             }
         }
 
+        // convert all in to bet or raise or call
+        if(lastPlayerAction.type == Action.Type.ALL_IN) lastPlayerAction = convertCurrentPlayerAllInAction();
+
+        // check preflop completion condition
         if((lastPlayerAction.type == Action.Type.CHECK) && (lastBetPlayerIndex == -1) &&
                 (actionPlayerIndex == (smallBlindPlayerIndex + 1)%2) && (opennedCards.size() == 0)){
             completeBet();
@@ -338,23 +347,36 @@ public class GameEngine {
 	}
 	
 	private boolean validateReceivedAction(Action recievedAction){
+	    // convert all in action to bet or raise or check to simplify logic
+	    if(recievedAction.type == Action.Type.ALL_IN){
+	        recievedAction = convertCurrentPlayerAllInAction();
+            if(recievedAction == null){
+                return false;
+            }
+        }
+
 	    switch(lastPlayerAction.type){
             case CHECK:{
-                // accept: fold, check, bet
+                // accept: fold, check, bet, all in
                 if(recievedAction.type == Action.Type.CALL || recievedAction.type == Type.RAISE){
+                    return false;
+                }
+
+                // player must have enough value to raise
+                if (recievedAction.type == Action.Type.BET && players[actionPlayerIndex].stack < recievedAction.value){
                     return false;
                 }
 
                 // can't bet more than opponent have
                 int nextPlayerIndex = (actionPlayerIndex + 1)%2;
-                if(recievedAction.type == Action.Type.BET && recievedAction.value > playersBetValues[nextPlayerIndex]){
+                if(recievedAction.type == Action.Type.BET && recievedAction.value > players[nextPlayerIndex].stack){
                     return false;
                 }
 
                 break;
             }
             case BET:{
-                // accept: fold, call, raise
+                // accept: fold, call, raise, all in
                 if(recievedAction.type == Action.Type.CHECK || recievedAction.type == Action.Type.BET){
                     return false;
                 }
@@ -377,7 +399,7 @@ public class GameEngine {
                 break;
             }
             case RAISE:{
-                // accept: fold, call, raise
+                // accept: fold, call, raise, all in
                 if(recievedAction.type == Action.Type.CHECK || recievedAction.type == Action.Type.BET){
                     return false;
                 }
@@ -397,6 +419,19 @@ public class GameEngine {
                     }
                 }
 
+                break;
+            }
+            case CALL:{
+                // accept bet only in preflop from the big blind
+                if(recievedAction.type == Action.Type.BET && opennedCards.size() == 0 &&
+                        actionPlayerIndex == (smallBlindPlayerIndex + 1)%2){
+                    // player must have enough value to raise
+                    if (players[actionPlayerIndex].stack < recievedAction.value){
+                        return false;
+                    }
+                }else if(recievedAction.type != Action.Type.CHECK && recievedAction.type != Action.Type.FOLD){
+                    return false;
+                }
                 break;
             }
         }
@@ -429,6 +464,10 @@ public class GameEngine {
             if(userCombination != null && botCombination != null){
                 // find out who has better combination
                 roundResult = CombinatorsPredictor.compareTwoCombinations(userCombination, botCombination);
+
+                // force interface redraw to open bot's cards
+                Card[] aOpenedCards = opennedCards.size() > 0 ? opennedCards.toArray(new Card[opennedCards.size()]) : new Card[0];
+                gameInterface.redraw(players, aOpenedCards, lastPlayerAction, bankValue, true);
             }else{
                 // something went wrong, so force draw
                 roundResult = 0;
@@ -474,4 +513,25 @@ public class GameEngine {
         // clear last player actions
         lastPlayerAction = null;
 	}
+
+    private Action convertCurrentPlayerAllInAction(){
+        // convert all in to bet or raise or call
+        Action newAction;
+        newAction = null;
+
+        if(betValue == 0){
+            newAction = new Action();
+            newAction.type = Action.Type.BET;
+            newAction.value = players[actionPlayerIndex].stack;
+        }else if(playersBetValues[actionPlayerIndex] + players[actionPlayerIndex].stack == betValue){
+            newAction = new Action();
+            newAction.type = Action.Type.CALL;
+        }else if(playersBetValues[actionPlayerIndex] + players[actionPlayerIndex].stack > betValue){
+            newAction  = new Action();
+            newAction.type = Action.Type.RAISE;
+            newAction.value = playersBetValues[actionPlayerIndex] + players[actionPlayerIndex].stack - betValue;
+        }
+
+        return newAction;
+    }
 }
