@@ -82,7 +82,7 @@ public class GameInterface {
                 }
                 else if(Character.isDigit(tok[0].charAt(0))) {
                     int getBet = Integer.valueOf(tok[0]).intValue();
-                    if(getBet < 100 || getBet % 100 > 0) {
+                    if (getBet % 100 != 0) {
                         System.out.println("Must be divisible by 100");
                         continue;
                     }
@@ -93,7 +93,7 @@ public class GameInterface {
                 else if(tok[0].charAt(0) == '+') {
                     String firstTok = (tok.length > 1) ? tok[0] + tok[1] : tok[0];
                     int getVal = Integer.valueOf(firstTok.substring(1,firstTok.length())).intValue() + botAction.value;
-                    if(getVal < 100 || getVal % 100 > 0) {
+                    if (getVal % 100 != 0) {
                         System.out.println("Must be divisible by 100");
                         continue;
                     }
