@@ -1,7 +1,9 @@
 package logic;
 
+import java.util.ArrayList;
+
 public class Bot extends User {
-	public Action makeAction(Action lastUserAction, Card[] cards, int bank){
+	public Action makeAction(Action lastUserAction, ArrayList<Card> cards, int bank, boolean didLastMistake){
 		Action action = new Action();
 
 		// bot always agree for now
