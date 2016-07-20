@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import static java.lang.Math.abs;
-
 /**
  * Created by VladVin on 17.07.2016.
  */
@@ -26,46 +24,55 @@ public class CombinatorsPredictor {
             comb = checkStraightFlush(cardsComb);
             if (comb != null) {
                 bestCombination = findBestCombination(bestCombination, comb);
+                bestCombination.cards = cards;
                 continue;
             }
             comb = checkFourOfAKind(cardsComb);
             if (comb != null) {
                 bestCombination = findBestCombination(bestCombination, comb);
+                bestCombination.cards = cards;
                 continue;
             }
             comb = checkFullHouse(cardsComb);
             if (comb != null) {
                 bestCombination = findBestCombination(bestCombination, comb);
+                bestCombination.cards = cards;
                 continue;
             }
             comb = checkFlush(cardsComb);
             if (comb != null) {
                 bestCombination = findBestCombination(bestCombination, comb);
+                bestCombination.cards = cards;
                 continue;
             }
             comb = checkStraight(cardsComb);
             if (comb != null) {
                 bestCombination = findBestCombination(bestCombination, comb);
+                bestCombination.cards = cards;
                 continue;
             }
             comb = checkThreeOfAKind(cardsComb);
             if (comb != null) {
                 bestCombination = findBestCombination(bestCombination, comb);
+                bestCombination.cards = cards;
                 continue;
             }
             comb = checkTwoPair(cardsComb);
             if (comb != null) {
                 bestCombination = findBestCombination(bestCombination, comb);
+                bestCombination.cards = cards;
                 continue;
             }
             comb = checkOnePair(cardsComb);
             if (comb != null) {
                 bestCombination = findBestCombination(bestCombination, comb);
+                bestCombination.cards = cards;
                 continue;
             }
             comb = checkHighCard(cardsComb);
             if (comb != null) {
                 bestCombination = findBestCombination(bestCombination, comb);
+                bestCombination.cards = cards;
             }
         }
         return bestCombination;

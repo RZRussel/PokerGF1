@@ -1,5 +1,7 @@
 package logic;
 
+import java.util.List;
+
 /**
  * Created by VladVin on 17.07.2016.
  */
@@ -9,4 +11,5 @@ public class Combination {
 
     public Type type;
     public int priority;
+    public List<Card> cards;
 }
