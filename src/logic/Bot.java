@@ -3,7 +3,7 @@ package logic;
 import java.util.ArrayList;
 
 public class Bot extends User {
-	public Action makeAction(Action lastUserAction, ArrayList<Card> cards, int bank, boolean didLastMistake){
+	public Action makeAction(Action lastUserAction, ArrayList<Card> cards, int bank, int minBetValue, boolean didLastMistake){
 		Action action = new Action();
 
 		// bot always agree for now

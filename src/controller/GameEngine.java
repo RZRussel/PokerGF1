@@ -263,7 +263,7 @@ public class GameEngine {
         }else{
             Action botAction = null;
             do{
-                botAction = ((Bot)actionPlayer).makeAction(lastPlayerAction, opennedCards, bankValue, (wrongActionCounter > 0));
+                botAction = ((Bot)actionPlayer).makeAction(lastPlayerAction, opennedCards, bankValue, minBetValue, (wrongActionCounter > 0));
                 wrongActionCounter++;
             }while(!validateReceivedAction(botAction));
             lastPlayerAction = botAction;
