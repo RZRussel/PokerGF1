@@ -246,12 +246,12 @@ public class GameEngine {
             completeBet();
         }
 
+        // use counter to notify about error messages after first not valid one
+        int wrongActionCounter = 0;
         if(actionPlayer.getClass() == User.class){
             // request action from user until valid one not be detected
             Action userAction = null;
 
-            // use counter to notify about error messages after first not valid one
-            int wrongActionCounter = 0;
             do{
                 if(wrongActionCounter > 0){
                     gameInterface.notifyUserWithMessage("Your action is not valid. Please, try again!");
@@ -261,16 +261,12 @@ public class GameEngine {
             }while(!validateReceivedAction(userAction));
             lastPlayerAction = userAction;
         }else{
-            Card[] aOpenedCards = opennedCards.size() > 0 ? opennedCards.toArray(new Card[opennedCards.size()]) : new Card[0];
-            Action botAction = ((Bot)actionPlayer).makeAction(lastPlayerAction, aOpenedCards, bankValue);
-            if(validateReceivedAction(botAction)){
-                lastPlayerAction = botAction;
-            }else {
-                // mark bot fault for not valid action
-                lastPlayerAction = new Action();
-                lastPlayerAction.type = Action.Type.FOLD;
-                lastPlayerAction.value = 0;
-            }
+            Action botAction = null;
+            do{
+                botAction = ((Bot)actionPlayer).makeAction(lastPlayerAction, opennedCards, bankValue, minBetValue, (wrongActionCounter > 0));
+                wrongActionCounter++;
+            }while(!validateReceivedAction(botAction));
+            lastPlayerAction = botAction;
         }
 
         // convert all in to bet or raise or call
