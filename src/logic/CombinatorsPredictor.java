@@ -1,6 +1,8 @@
 package logic;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -29,6 +31,26 @@ public class CombinatorsPredictor {
                 bestCombination = findBestCombination(bestCombination, comb);
                 continue;
             }
+            comb = checkFullHouse(cardsComb);
+            if (comb != null) {
+                bestCombination = findBestCombination(bestCombination, comb);
+                continue;
+            }
+            comb = checkFlush(cardsComb);
+            if (comb != null) {
+                bestCombination = findBestCombination(bestCombination, comb);
+                continue;
+            }
+            comb = checkStraight(cardsComb);
+            if (comb != null) {
+                bestCombination = findBestCombination(bestCombination, comb);
+                continue;
+            }
+            comb = checkThreeOfAKind(cardsComb);
+            if (comb != null) {
+                bestCombination = findBestCombination(bestCombination, comb);
+                continue;
+            }
             comb = checkTwoPair(cardsComb);
             if (comb != null) {
                 bestCombination = findBestCombination(bestCombination, comb);
@@ -47,10 +69,10 @@ public class CombinatorsPredictor {
         return bestCombination;
     }
 
-    public static Combination predictBestCombination(final Card card1, final Card card2) {
-        Combination comb = new Combination();
-        return comb;
-    }
+//    public static Combination predictBestCombination(final Card card1, final Card card2) {
+//        Combination comb = new Combination();
+//        return comb;
+//    }
 
     public static int compareTwoCombinations(final Combination combination1, final Combination combination2) {
         if (combination1.type.ordinal() < combination2.type.ordinal()) {
@@ -116,8 +138,12 @@ public class CombinatorsPredictor {
         boolean hardOrdered = true;
         boolean steelWheel = false;
         for (int i = 1; i < cardsComb.size(); i++) {
-            if (cardsComb.get(i).value.ordinal() - cardsComb.get(i--).value.ordinal() != 1) {
-                if ((i == cardsComb.size() - 1) && cardsComb.get(i).value == Card.Value.ACE) {
+            if (cardsComb.get(i).value.ordinal() - cardsComb.get(i - 1).value.ordinal() != 1 ||
+                    cardsComb.get(i).suite != cardsComb.get(i - 1).suite) {
+                if ((i == cardsComb.size() - 1) &&
+                        cardsComb.get(i).value == Card.Value.ACE &&
+                        cardsComb.get(0).value == Card.Value.C2 &&
+                        cardsComb.get(i).suite == cardsComb.get(i - 1).suite) {
                     steelWheel = true;
                 }
                 if (!steelWheel) {
@@ -157,6 +183,111 @@ public class CombinatorsPredictor {
             Combination comb = new Combination();
             comb.type = Combination.Type.FOUR_OF_A_KIND;
             comb.priority = priority;
+            return comb;
+        }
+        return null;
+    }
+
+    private static Combination checkFullHouse(final List<Card> cardsComb) {
+        HashMap<Card.Value, Integer> map = new HashMap<>();
+        for (Card card : cardsComb) {
+            int count = (map.containsKey(card.value)) ? card.value.ordinal() : 0;
+            map.put(card.value, count + 1);
+        }
+        if (map.size() == 2) {
+            Iterator<Card.Value> it = map.keySet().iterator();
+            Card.Value value1 = it.next();
+            Card.Value value2 = it.next();
+            boolean isFullHouse = false;
+            int priority1 = -1;
+            int priority2 = -1;
+            if (map.get(value1) == 3 && map.get(value2) == 2) {
+                priority1 = value1.ordinal();
+                priority2 = value2.ordinal();
+                isFullHouse = true;
+            } else if (map.get(value1) == 2 && map.get(value2) == 3) {
+                priority1 = value2.ordinal();
+                priority2 = value1.ordinal();
+                isFullHouse = true;
+            }
+            if (isFullHouse) {
+                int priority = 100 * priority1 + priority2;
+                Combination comb = new Combination();
+                comb.type = Combination.Type.FULL_HOUSE;
+                comb.priority = priority;
+                return comb;
+            }
+        }
+        return null;
+    }
+
+    private static Combination checkFlush(final List<Card> cardsComb) {
+        Card.Suite suite = cardsComb.get(0).suite;
+        boolean isFlush = true;
+        for (Card card : cardsComb) {
+            if (card.suite != suite) {
+                isFlush = false;
+                break;
+            }
+        }
+        if (isFlush) {
+            Combination comb = new Combination();
+            comb.type = Combination.Type.FLUSH;
+            comb.priority = cardsComb.get(cardsComb.size() - 1).value.ordinal();
+            return comb;
+        }
+        return null;
+    }
+
+    private static Combination checkStraight(final List<Card> cardsComb) {
+        boolean hardOrdered = true;
+        boolean steelWheel = false;
+        for (int i = 1; i < cardsComb.size(); i++) {
+            if (cardsComb.get(i).value.ordinal() - cardsComb.get(i - 1).value.ordinal() != 1) {
+                if ((i == cardsComb.size() - 1) &&
+                        cardsComb.get(i).value == Card.Value.ACE &&
+                        cardsComb.get(0).value == Card.Value.C2) {
+                    steelWheel = true;
+                }
+                if (!steelWheel) {
+                    hardOrdered = false;
+                }
+                break;
+            }
+        }
+        if (hardOrdered) {  // Straight
+            Combination comb = new Combination();
+            comb.type = Combination.Type.STRAIGHT;
+            if (!steelWheel) {
+                comb.priority = cardsComb.get(cardsComb.size() - 1).value.ordinal();
+            } else {
+                comb.priority = cardsComb.get(cardsComb.size() - 2).value.ordinal();
+            }
+            return comb;
+        }
+        return null;
+    }
+
+    private static Combination checkThreeOfAKind(final List<Card> cardsComb) {
+        int maxValueCardIdx = -1;
+        for (int i = cardsComb.size() - 1; i >= cardsComb.size() - 3; i--) {
+            boolean isEqual = true;
+            for (int j = i - 1; j >= i - 2; j--) {
+                if (cardsComb.get(j).value != cardsComb.get(i).value) {
+                    isEqual = false;
+                    maxValueCardIdx = i;
+                    break;
+                }
+            }
+            if (isEqual) {
+                break;
+            }
+        }
+        if (maxValueCardIdx != -1) {
+            Combination comb = new Combination();
+            comb.type = Combination.Type.THREE_OF_A_KIND;
+            comb.priority = cardsComb.get(maxValueCardIdx).value.ordinal();
+            return comb;
         }
         return null;
     }
