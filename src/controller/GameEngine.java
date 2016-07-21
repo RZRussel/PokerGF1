@@ -470,6 +470,7 @@ public class GameEngine {
                 // force interface redraw to open bot's cards
                 Card[] aOpenedCards = opennedCards.size() > 0 ? opennedCards.toArray(new Card[opennedCards.size()]) : new Card[0];
                 gameInterface.redraw(players, aOpenedCards, lastPlayerAction, bankValue, true);
+                gameInterface.showRoundCombinations(userCombination, botCombination);
             }else{
                 // something went wrong, so force draw
                 roundResult = 0;

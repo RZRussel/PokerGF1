@@ -2,8 +2,12 @@ package view;
 
 import logic.Action;
 import logic.Card;
+import logic.Combination;
 import logic.Player;
+
+import java.util.Comparator;
 import java.util.Scanner;
+import java.util.StringJoiner;
 
 public class GameInterface {
 	private static final String[] strSuit = {"\u2665", "\u2666", "\u2663", "\u2660"};
@@ -81,7 +85,7 @@ public class GameInterface {
                     return ac;
                 }
                 else if(Character.isDigit(tok[0].charAt(0))) {
-                    int getBet = Integer.valueOf(tok[0]).intValue();
+                    int getBet = Integer.parseInt(tok[0]);
                     if (getBet % 100 != 0) {
                         System.out.println("Must be divisible by 100");
                         continue;
@@ -92,7 +96,7 @@ public class GameInterface {
                 }
                 else if(tok[0].charAt(0) == '+') {
                     String firstTok = (tok.length > 1) ? tok[0] + tok[1] : tok[0];
-                    int getVal = Integer.valueOf(firstTok.substring(1,firstTok.length())).intValue();
+                    int getVal = Integer.parseInt(firstTok.substring(1,firstTok.length()));
                     if (getVal % 100 != 0) {
                         System.out.println("Must be divisible by 100");
                         continue;
@@ -114,6 +118,19 @@ public class GameInterface {
 	public void notifyUserWithMessage(String message){
 		System.out.println(message);
 	}
+
+	public void showRoundCombinations(Combination userCombination, Combination botCombination) {
+	    String userCombStr = "";
+        for (Card card : userCombination.cards) {
+            userCombStr += strSuit[card.suite.ordinal()] + strName[card.value.ordinal()];
+        }
+	    System.out.println("Your combination: " + userCombStr);
+        String botCombStr = "";
+        for (Card card : botCombination.cards) {
+            botCombStr += strSuit[card.suite.ordinal()] + strName[card.value.ordinal()];
+        }
+        System.out.println("Bot combination: " + botCombStr);
+    }
 
     public void Test() {
 

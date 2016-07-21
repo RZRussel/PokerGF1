@@ -24,55 +24,55 @@ public class CombinatorsPredictor {
             comb = checkStraightFlush(cardsComb);
             if (comb != null) {
                 bestCombination = findBestCombination(bestCombination, comb);
-                bestCombination.cards = cards;
+                bestCombination.cards = cardsComb;
                 continue;
             }
             comb = checkFourOfAKind(cardsComb);
             if (comb != null) {
                 bestCombination = findBestCombination(bestCombination, comb);
-                bestCombination.cards = cards;
+                bestCombination.cards = cardsComb;
                 continue;
             }
             comb = checkFullHouse(cardsComb);
             if (comb != null) {
                 bestCombination = findBestCombination(bestCombination, comb);
-                bestCombination.cards = cards;
+                bestCombination.cards = cardsComb;
                 continue;
             }
             comb = checkFlush(cardsComb);
             if (comb != null) {
                 bestCombination = findBestCombination(bestCombination, comb);
-                bestCombination.cards = cards;
+                bestCombination.cards = cardsComb;
                 continue;
             }
             comb = checkStraight(cardsComb);
             if (comb != null) {
                 bestCombination = findBestCombination(bestCombination, comb);
-                bestCombination.cards = cards;
+                bestCombination.cards = cardsComb;
                 continue;
             }
             comb = checkThreeOfAKind(cardsComb);
             if (comb != null) {
                 bestCombination = findBestCombination(bestCombination, comb);
-                bestCombination.cards = cards;
+                bestCombination.cards = cardsComb;
                 continue;
             }
             comb = checkTwoPair(cardsComb);
             if (comb != null) {
                 bestCombination = findBestCombination(bestCombination, comb);
-                bestCombination.cards = cards;
+                bestCombination.cards = cardsComb;
                 continue;
             }
             comb = checkOnePair(cardsComb);
             if (comb != null) {
                 bestCombination = findBestCombination(bestCombination, comb);
-                bestCombination.cards = cards;
+                bestCombination.cards = cardsComb;
                 continue;
             }
             comb = checkHighCard(cardsComb);
             if (comb != null) {
                 bestCombination = findBestCombination(bestCombination, comb);
-                bestCombination.cards = cards;
+                bestCombination.cards = cardsComb;
             }
         }
         return bestCombination;
