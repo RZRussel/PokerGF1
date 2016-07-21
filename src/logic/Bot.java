@@ -97,6 +97,8 @@ public class Bot extends User {
             }
         }
         if (combPower >= 30){
+            combPower /= 20;
+            combPower *= 100;
             if (lastUserAction.type != Action.Type.FOLD) {
                 action.type = Action.Type.RAISE;
                 action.value = combPower;

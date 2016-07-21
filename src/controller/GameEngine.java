@@ -345,6 +345,11 @@ public class GameEngine {
 	private boolean validateReceivedAction(Action recievedAction){
 	    // convert all in action to bet or raise or check to simplify logic
 	    if(recievedAction.type == Action.Type.ALL_IN){
+	        // reject all in if stack is empty
+	        if(players[actionPlayerIndex].stack == 0){
+	            return false;
+            }
+
 	        recievedAction = convertCurrentPlayerAllInAction();
             if(recievedAction == null){
                 return false;
