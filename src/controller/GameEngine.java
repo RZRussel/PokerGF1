@@ -130,8 +130,8 @@ public class GameEngine {
 
         // prepare card stores
         cardStackGenerator = new Random();
-        cardStack = new Stack<Card>();
-        opennedCards = new ArrayList<Card>();
+        cardStack = new Stack<>();
+        opennedCards = new ArrayList<>();
 
         while(startNewRound()){}
 
@@ -180,7 +180,7 @@ public class GameEngine {
 	
 	private void mixAndSetupInitialRoundCards(){
         // generate all cards
-		ArrayList<Card> cards = new ArrayList<Card>();
+		ArrayList<Card> cards = new ArrayList<>();
         for (Card.Suite suite : Card.Suite.values()){
             for(Card.Value value : Card.Value.values()){
                 Card card = new Card();
@@ -250,7 +250,7 @@ public class GameEngine {
         int wrongActionCounter = 0;
         if(actionPlayer.getClass() == User.class){
             // request action from user until valid one not be detected
-            Action userAction = null;
+            Action userAction;
 
             do{
                 if(wrongActionCounter > 0){
@@ -261,7 +261,7 @@ public class GameEngine {
             }while(!validateReceivedAction(userAction));
             lastPlayerAction = userAction;
         }else{
-            Action botAction = null;
+            Action botAction;
             do{
                 botAction = ((Bot)actionPlayer).makeAction(lastPlayerAction, opennedCards, bankValue, minBetValue, (wrongActionCounter > 0));
                 wrongActionCounter++;
@@ -469,6 +469,7 @@ public class GameEngine {
                 // force interface redraw to open bot's cards
                 Card[] aOpenedCards = opennedCards.size() > 0 ? opennedCards.toArray(new Card[opennedCards.size()]) : new Card[0];
                 gameInterface.redraw(players, aOpenedCards, lastPlayerAction, bankValue, true);
+                gameInterface.showRoundCombinations(userCombination, botCombination);
             }else{
                 // something went wrong, so force draw
                 roundResult = 0;
