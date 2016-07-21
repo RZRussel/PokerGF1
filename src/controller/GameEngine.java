@@ -39,6 +39,10 @@ import static logic.Action.*;
  * from the dealer leftmost player(in our case first time from the small blind and than from the big one).
  */
 public class GameEngine {
+    static final short GEERROR_INVALID_ACTIONS_ORDER = 1;
+    static final short GEERROR_NOT_ENOUGH_IN_STACK = 2;
+    static final short GEERROR_NOT_MATCH_OPPONENT_STACK = 3;
+
     /**
      * Minimum value any player can bet or raise on his turn
      */
@@ -247,25 +251,25 @@ public class GameEngine {
         }
 
         // use counter to notify about error messages after first not valid one
-        int wrongActionCounter = 0;
+        short validationResult = 0;
         if(actionPlayer.getClass() == User.class){
             // request action from user until valid one not be detected
             Action userAction = null;
-
             do{
-                if(wrongActionCounter > 0){
-                    gameInterface.notifyUserWithMessage("Your action is not valid. Please, try again!");
+                if(validationResult > 0){
+                    displayErrorMessageForCode(lastPlayerAction, validationResult);
                 }
                 userAction = gameInterface.requestActionFromUser(lastPlayerAction);
-                wrongActionCounter++;
-            }while(!validateReceivedAction(userAction));
+
+                validationResult = validateReceivedAction(userAction);
+            }while(validationResult != 0);
             lastPlayerAction = userAction;
         }else{
             Action botAction = null;
             do{
-                botAction = ((Bot)actionPlayer).makeAction(lastPlayerAction, opennedCards, bankValue, minBetValue, (wrongActionCounter > 0));
-                wrongActionCounter++;
-            }while(!validateReceivedAction(botAction));
+                botAction = ((Bot)actionPlayer).makeAction(lastPlayerAction, opennedCards, bankValue, minBetValue, (validationResult != 0));
+                validationResult = validateReceivedAction(botAction);
+            }while(validationResult != 0);
             lastPlayerAction = botAction;
         }
 
@@ -342,36 +346,33 @@ public class GameEngine {
 		return true;
 	}
 	
-	private boolean validateReceivedAction(Action recievedAction){
+	private short validateReceivedAction(Action recievedAction){
 	    // convert all in action to bet or raise or check to simplify logic
 	    if(recievedAction.type == Action.Type.ALL_IN){
 	        // reject all in if stack is empty
 	        if(players[actionPlayerIndex].stack == 0){
-	            return false;
+	            return GEERROR_NOT_ENOUGH_IN_STACK;
             }
 
 	        recievedAction = convertCurrentPlayerAllInAction();
-            if(recievedAction == null){
-                return false;
-            }
         }
 
 	    switch(lastPlayerAction.type){
             case CHECK:{
                 // accept: fold, check, bet, all in
                 if(recievedAction.type == Action.Type.CALL || recievedAction.type == Type.RAISE){
-                    return false;
+                    return GEERROR_INVALID_ACTIONS_ORDER;
                 }
 
                 // player must have enough value to raise
                 if (recievedAction.type == Action.Type.BET && players[actionPlayerIndex].stack < recievedAction.value){
-                    return false;
+                    return GEERROR_NOT_ENOUGH_IN_STACK;
                 }
 
                 // can't bet more than opponent have
                 int nextPlayerIndex = (actionPlayerIndex + 1)%2;
                 if(recievedAction.type == Action.Type.BET && recievedAction.value > players[nextPlayerIndex].stack){
-                    return false;
+                    return GEERROR_NOT_MATCH_OPPONENT_STACK;
                 }
 
                 break;
@@ -379,7 +380,7 @@ public class GameEngine {
             case BET:{
                 // accept: fold, call, raise, all in
                 if(recievedAction.type == Action.Type.CHECK || recievedAction.type == Action.Type.BET){
-                    return false;
+                    return GEERROR_INVALID_ACTIONS_ORDER;
                 }
 
                 if(recievedAction.type == Action.Type.RAISE){
@@ -387,13 +388,13 @@ public class GameEngine {
 
                     // player must have enough value to raise
                     if (players[actionPlayerIndex].stack < subtractValue){
-                        return false;
+                        return GEERROR_NOT_ENOUGH_IN_STACK;
                     }
 
                     // opponent must have enough value
                     int nextPlayerIndex = (actionPlayerIndex + 1)%2;
                     if(players[nextPlayerIndex].stack < recievedAction.value){
-                        return false;
+                        return GEERROR_NOT_MATCH_OPPONENT_STACK;
                     }
                 }
 
@@ -402,7 +403,7 @@ public class GameEngine {
             case RAISE:{
                 // accept: fold, call, raise, all in
                 if(recievedAction.type == Action.Type.CHECK || recievedAction.type == Action.Type.BET){
-                    return false;
+                    return GEERROR_INVALID_ACTIONS_ORDER;
                 }
 
                 if(recievedAction.type == Action.Type.RAISE){
@@ -410,13 +411,13 @@ public class GameEngine {
 
                     // player must have enough value to raise
                     if (players[actionPlayerIndex].stack < subtractValue){
-                        return false;
+                        return GEERROR_NOT_ENOUGH_IN_STACK;
                     }
 
                     // opponent must have enough value
                     int nextPlayerIndex = (actionPlayerIndex + 1)%2;
                     if(players[nextPlayerIndex].stack < recievedAction.value){
-                        return false;
+                        return GEERROR_NOT_MATCH_OPPONENT_STACK;
                     }
                 }
 
@@ -428,16 +429,16 @@ public class GameEngine {
                         actionPlayerIndex == (smallBlindPlayerIndex + 1)%2){
                     // player must have enough value to raise
                     if (players[actionPlayerIndex].stack < recievedAction.value){
-                        return false;
+                        return GEERROR_INVALID_ACTIONS_ORDER;
                     }
                 }else if(recievedAction.type != Action.Type.CHECK && recievedAction.type != Action.Type.FOLD){
-                    return false;
+                    return GEERROR_INVALID_ACTIONS_ORDER;
                 }
                 break;
             }
         }
 
-        return true;
+        return 0;
 	}
 
 	private  void calculateRoundResult(){
@@ -534,5 +535,29 @@ public class GameEngine {
         }
 
         return newAction;
+    }
+
+    private void displayErrorMessageForCode(Action lastBotAction, short errorCode){
+        switch(errorCode){
+            case GEERROR_INVALID_ACTIONS_ORDER:
+                String message = "Your action must match bot's last action.";
+                switch (lastBotAction.type){
+                    case BET: case RAISE:
+                        message = message + " Please, choose one of: '=' (call), '+'<value> (raise), 'a' (all in), 'f' (fold)";
+                        break;
+                    case CALL:
+                        message = message + " Please, choose one of: 'c' (check), '=' (call), <value> (bet), 'a' (all in), 'f' (fold)";
+                        break;
+                }
+
+                gameInterface.notifyUserWithMessage(message);
+                break;
+            case GEERROR_NOT_ENOUGH_IN_STACK:
+                gameInterface.notifyUserWithMessage("You don't have enough points in stack to make this action. Please, try again...");
+                break;
+            case GEERROR_NOT_MATCH_OPPONENT_STACK:
+                gameInterface.notifyUserWithMessage("Bot will not have enough points to stack to call you. Please, revise passed value to match bot's stack...");
+                break;
+        }
     }
 }
